@@ -1,0 +1,74 @@
+# ==== Python ====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# ==== Jupyter ====
+.ipynb_checkpoints/
+*.ipynb_meta
+
+# ==== Distribución / build ====
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ==== Datos de logs y resultados generados ====
+# Carpetas de entrada/salida generadas por el pipeline
+logs/
+parsed_logs/
+example_logs/
+example_parsed_logs/
+sample_logs/*/top_clusters.json
+
+# Resultados de Drain / Drain3
+drain3_*/
+drain_*/
+
+# Templates y regex generados
+templates/
+templates_example/
+
+# Carpetas de aprendizaje / cola
+learning_queue/
+*_learning_queue/
+
+# Benchmarks y resúmenes CSV generados
+resumen_*.csv
+*_benchmark*.json
+performance_metrics.*
+
+# ==== Configuraciones sensibles ====
+# Credenciales de AWS / OpenSearch, si se llegan a versionar por error
+.aws/
+*.pem
+*.key
+secrets.yaml
+secrets.yml
+
+# ==== Sistema operativo / IDE ====
+.DS_Store
+.vscode/
+.idea/
+
+# ==== Modelos descargados (sentence-transformers, huggingface cache) ====
+.cache/
+*.bin
+*.safetensors
+
+# Documentacion 
+doc/
+downloaded_log/
+drain3_parsed_results/
+others/
+
+# Logs
+*.log
+*.parquet

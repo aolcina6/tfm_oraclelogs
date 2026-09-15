@@ -1,0 +1,2 @@
+output_folder: "parsed_logs/"
+drain_folder: "drain_results/"
