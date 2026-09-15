@@ -136,7 +136,7 @@ Para más detalle sobre argumentos y opciones de cada módulo, consulta los note
 
 | Notebook | Contenido |
 |---|---|
-| module_testing.ipynb | Guía completa de los módulos (parsing, Drain, Drain3, template generator) con ejemplos ejecutables sobre un conjunto reducido de logs (example_logs). |
+| demo_completa.ipynb | Guía completa de los módulos (parsing, Drain, Drain3, template generator) con ejemplos ejecutables sobre un conjunto reducido de logs (example_logs). |
 | `onboarding.ipynb` | Guía paso a paso para incorporar un nuevo tipo de log al sistema (bootstrapping de configuración, procesamiento y generación de templates/regex). |
 | demo_flujo_template_generator.ipynb | Demo detallada del flujo interno de generación de templates (Drain3 → extracción → agrupación semántica → regex) sobre un origen concreto. |
 | demo_flujo_parsing.ipynb | Demo de las utilidades del flujo de parseo. |

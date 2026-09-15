@@ -72,3 +72,7 @@ others/
 # Logs
 *.log
 *.parquet
+
+
+# Zip
+*.zip
