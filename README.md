@@ -178,6 +178,57 @@ Esto arrancará un servidor Flask accesible en tu `localhost` (por defecto en el
 
 ---
 
+## 🧪 Benchmark contra logpai/logparser
+
+Como parte del análisis del estado del arte, se incluye un módulo de *benchmarking* (`logparser_coverage.py`) que ejecuta varios algoritmos clásicos de *log parsing* del proyecto [logpai/logparser](https://github.com/logpai/logparser) (Drain, Spell, AEL, IPLoM, LenMa, LogCluster, LogSig, SLCT, entre otros) sobre los logs de example_logs, y calcula métricas de cobertura para compararlos con el pipeline propio.
+
+### Instalación
+
+```bash
+pip install "logparser3 @ git+https://github.com/logpai/logparser.git" --no-deps
+pip install regex pandas numpy
+```
+
+> ⚠️ Si aparece un conflicto de versiones con `regex` (por ejemplo, por incompatibilidad con `transformers`), instala la versión más reciente explícitamente: `pip install --upgrade "regex>=2025.10.22"`.
+
+### Ejecución
+
+```bash
+python logparser_coverage.py \
+    --origin ais \
+    --log-file example_logs/COV_AIS_LOG.log \
+    --log-format "<Date> <Time> <Level> <Content>" \
+    --algorithms drain spell ael iplom \
+    --output benchmarks_logparser
+```
+
+**Parámetros principales:**
+
+| Argumento | Descripción |
+|---|---|
+| `--origin` | Nombre del origen a analizar (solo para etiquetar la salida). |
+| `--log-file` | Ruta al fichero de log a procesar. |
+| `--log-format` | Formato de log estilo logparser, ej. `"<Date> <Time> <Level> <Content>"`. |
+| `--algorithms` | Uno o varios algoritmos a ejecutar (drain, `spell`, `ael`, `iplom`, `lenma`, `logcluster`, `logsig`, `slct`, entre otros). |
+| `--output` | Carpeta donde se guardan los resultados y el resumen (default: `benchmarks_logparser`). |
+
+### Resultados
+
+Se genera una carpeta por algoritmo con los `_structured.csv` y `_templates.csv` originales de logparser, junto a un resumen comparativo:
+
+```
+benchmarks_logparser/
+├── drain/
+├── spell/
+├── ael/
+├── iplom/
+└── ais_logparser_coverage.json
+```
+
+El JSON de resumen incluye, por algoritmo, el número de plantillas generadas, el porcentaje de líneas cubiertas y el tiempo de ejecución, lo que permite comparar de forma objetiva la cobertura obtenida frente al pipeline propio (Drain3 + template_generator).
+
+---
+
 ## 🤖 Nota de honestidad académica
 
 Este proyecto ha sido desarrollado con el apoyo de herramientas de inteligencia artificial (GitHub Copilot, modelos LLM tipo Claude/GPT) como asistentes de programación durante distintas fases del desarrollo: generación de código repetitivo o boilerplate, depuración, redacción y formateo de documentación (incluido este README), y sugerencias de refactorización.
