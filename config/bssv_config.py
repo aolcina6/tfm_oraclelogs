@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------
+# BSSV (Business Services Server)
+# Exponer/consumir servicios empresariales Java
+# ------------------------------------------------------------------------------------
 LOG_TYPE = "bssv"
 MULTILINE = True
 DRAIN_CONFIG = "strict_deep"

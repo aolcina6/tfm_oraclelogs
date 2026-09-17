@@ -101,7 +101,7 @@ def load_config_module(log_type: str):
         module: Módulo de configuración cargado
     """
     
-    # ✅ Verificar caché
+    # Verificar caché
     if log_type in _config_cache:
         return _config_cache[log_type]
     

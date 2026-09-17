@@ -11,7 +11,7 @@ Requiere:
 o bien tener el repo clonado en external/logparser/ (ver README).
 
 Uso:
-    python template_generator/benchmarking/logparser_coverage.py \
+    python logparser_coverage.py \
         --origin ais \
         --log-file example_logs/COV_AIS_LOG.log \
         --log-format "<Date> <Time> <Level> <Content>" \
@@ -55,6 +55,43 @@ ALGORITHM_REGISTRY = {
         "class": "LogParser",
         "params": {},
     },
+    "iplom": {
+        "module": "logparser.IPLoM", 
+        "class": "LogParser",
+        "params": {},
+    },
+    "lfa": {
+        "module": "logparser.LFA",
+        "class": "LogParser",
+        "params": {},
+    },
+    "lke": {
+        "module": "logparser.LKE", 
+        "class": "LogParser",
+        "params": {},
+    },
+    "lenma": {
+        "module": "logparser.LenMa",
+    }, 
+    "logcluster": {
+        "module": "logparser.LogCluster",
+        "class": "LogParser",
+        "params": {},
+    }, 
+    "logmine": {
+        "module": "logparser.LogMine",
+        "class": "LogParser",
+        "params": {},
+    }, 
+    "logsig": {
+        "module": "logparser.LogSig"
+    }, 
+    "logram": {
+        "module": "logparser.LogRam",
+        "class": "LogParser",
+        "params": {},
+    }, 
+    
 }
 
 

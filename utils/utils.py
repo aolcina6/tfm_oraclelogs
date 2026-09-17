@@ -28,12 +28,11 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
     if not timestamp_str:
         return {'timestamp_normalized': None}
 
-    # ✅ Usar patrones específicos si se proporcionan, si no los generales
+    # Usar patrones específicos si se proporcionan, si no los generales
     patterns_to_use = timestamp_patterns or GENERAL_PATTERNS
 
     timestamp_str = timestamp_str.strip()
 
-    # ✅ Fix: iterar sobre patterns_to_use, no sobre el import global fijo
     for idx, pattern in enumerate(patterns_to_use):
         match = re.search(pattern, timestamp_str)
         if match:
@@ -44,12 +43,12 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
                 if not year:
                     year = '2026'
 
-                # ✅ NUEVO: Convertir mes a número con TODOS los mapeos
+                # Convertir mes a número con TODOS los mapeos
                 month = None
                 
                 if groups.get('month_name'):
                     month_name_raw = groups['month_name']
-                    # ✅ Intentar en este orden: lowercase → capitalized → uppercase
+                    # Intentar en este orden: lowercase → capitalized → uppercase
                     month = (
                         MONTH_MAP_LOWERCASE.get(month_name_raw.lower())
                         or MONTH_MAP_CAPITALIZED.get(month_name_raw)
@@ -61,7 +60,7 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
                 elif groups.get('month'):
                     month = groups['month']
                 
-                # ✅ Por defecto enero si no se encontró
+                # Por defecto enero si no se encontró
                 month = month or '01'
 
                 day = groups.get('day', '01')
@@ -79,7 +78,7 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
                 if not second:
                     second = '00'
 
-                # ✅ Manejo de milisegundos vs microsegundos
+                # Manejo de milisegundos vs microsegundos
                 milliseconds = '000'
                 if groups.get('milliseconds'):
                     milliseconds = groups['milliseconds'][:3].ljust(3, '0')
@@ -87,7 +86,7 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
                     microseconds = groups['microseconds']
                     milliseconds = microseconds[:3].ljust(3, '0')
 
-                # ✅ Padding correcto
+                # Padding correcto
                 day = str(day).zfill(2)
                 month = str(month).zfill(2)
                 hour = str(hour).zfill(2)
@@ -95,7 +94,7 @@ def detect_and_normalize_timestamp(timestamp_str: str, timestamp_patterns=None) 
                 second = str(second).zfill(2)
                 milliseconds = str(milliseconds).zfill(3)
 
-                # ✅ Año corto (últimos 2 dígitos)
+                # Año corto (últimos 2 dígitos)
                 year_short = str(year)[-2:]
                 normalized = f"{day}/{month}/{year_short} {hour}:{minute}:{second}.{milliseconds}"
 
@@ -203,7 +202,6 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
     Returns:
         str: Timestamp normalizado o None si no se pudo normalizar.
     """
-    # ✅ Importar mapas de meses desde general_config
     try:
         from config.general_config import (
             MONTH_MAP_SPANISH, MONTH_MAP_CAPITALIZED, MONTH_MAP_LOWERCASE
@@ -231,7 +229,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
 
     timestamp_str = timestamp_str.strip()
 
-    # ✅ ESTRATEGIA 0: Oracle/Listener format
+    # ESTRATEGIA 0: Oracle/Listener format
     # "23-DEC-2024 11:44:26" o "23-Dec-2024 11:44:26"
     oracle_format = re.match(
         r'^(\d{1,2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC|ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)-(\d{4})\s+(\d{2}):(\d{2}):(\d{2})',
@@ -255,7 +253,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
                 print(f"  ✅ Oracle/Listener: '{timestamp_str}' → '{result}'")
             return result
 
-    # ✅ ESTRATEGIA 1: Syslog CON día de la semana (JDE)
+    # ESTRATEGIA 1: Syslog CON día de la semana (JDE)
     # "Sun Aug  9 02:00:07.608092"
     syslog_with_weekday = re.match(
         r'^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s{1,2}(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\.(\d{6})',
@@ -277,7 +275,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
                 print(f"  ✅ JDE (con weekday): '{timestamp_str}' → '{result}'")
             return result
 
-    # ✅ ESTRATEGIA 2: Syslog SIN día de la semana (JDEDEBUG, BSSV, AIS)
+    # ESTRATEGIA 2: Syslog SIN día de la semana (JDEDEBUG, BSSV, AIS)
     # "Aug 20 19:14:03.206883" o "Aug  7 12:49:21.108103"
     syslog_without_weekday = re.match(
         r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s{1,2}(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\.(\d{6})',
@@ -299,7 +297,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
                 print(f"  ✅ Syslog (sin weekday): '{timestamp_str}' → '{result}'")
             return result
 
-    # ✅ ESTRATEGIA 3: BSSV/AIS con coma (español e inglés)
+    # ESTRATEGIA 3: BSSV/AIS con coma (español e inglés)
     # "31 jul 2026 23:34:03,027" o "07 ago 2026 01:51:46,148"
     bssv_format = re.match(
         r'^(\d{1,2})\s+(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})\s+(\d{2}):(\d{2}):(\d{2})[,.](\d{3})',
@@ -322,7 +320,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
                 print(f"  ✅ BSSV/AIS: '{timestamp_str}' → '{result}'")
             return result
 
-    # ✅ ESTRATEGIA 4: ISO 8601
+    # ESTRATEGIA 4: ISO 8601
     # "2020-02-14T20:14:34.807103"
     iso_match = re.match(
         r'^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d+)',
@@ -337,7 +335,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
             print(f"  ✅ ISO 8601: '{timestamp_str}' → '{result}'")
         return result
 
-    # ✅ ESTRATEGIA 5: Numérico variado
+    # ESTRATEGIA 5: Numérico variado
     # "dd/mm/yyyy hh:mm:ss.ms" o "mm/dd/yyyy hh:mm:ss.ms"
     numeric_match = re.match(
         r'^(\d{1,2})[/\-](\d{1,2})[/\-](\d{2,4})\s+(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?',
@@ -370,7 +368,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
             print(f"  ✅ Patrón NUMÉRICO detectado: '{result}'")
         return result
 
-    # ✅ ESTRATEGIA 2: Syslog SIN día de la semana (JDEDEBUG, BSSV, AIS)
+    # ESTRATEGIA 2: Syslog SIN día de la semana (JDEDEBUG, BSSV, AIS)
     # "Aug 20 19:14:03.206883" o "Aug  7 12:49:21.108103"
     syslog_without_weekday = re.match(
         r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s{1,2}(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\.(\d{6})',
@@ -392,7 +390,7 @@ def _normalize_timestamp_debug(timestamp_str: str, patterns: list, debug=False, 
                 print(f"  ✅ Syslog (sin weekday): '{timestamp_str}' → '{result}'")
             return result
 
-    # ✅ ESTRATEGIA 2b: Syslog clásico SIN microsegundos (Linux estándar)
+    # ESTRATEGIA 2b: Syslog clásico SIN microsegundos (Linux estándar)
     # "Jun 14 15:16:01" (sin día de la semana, sin fracción de segundo)
     syslog_no_fraction = re.match(
         r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s{1,2}(\d{1,2})\s+(\d{2}):(\d{2}):(\d{2})\s*$',

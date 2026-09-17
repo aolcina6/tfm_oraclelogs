@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------
+# Enterprise Server / kernel de JDE EnterpriseOne 
+# Pendiente clasificar logs HTML. 
+# ------------------------------------------------------------------------------------
 LOG_TYPE = "e1root"
 MULTILINE = True
 DRAIN_CONFIG = "baseline"

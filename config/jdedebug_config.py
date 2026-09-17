@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------------------------
+# Logs de depuración de JD Edwards EnterpriseOne
+# ------------------------------------------------------------------------------------
 LOG_TYPE = "jdedebug"
 MULTILINE = True
 DRAIN_CONFIG = "baseline"

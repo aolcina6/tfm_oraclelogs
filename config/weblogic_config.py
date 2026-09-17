@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------
+# WebLogic
+# servidor de aplicaciones Java sobre el que puede ejecutarse JAS
+# ------------------------------------------------------------------------------------
 LOG_TYPE = "weblogic"
 MULTILINE = True
 DRAIN_CONFIG = "deep"

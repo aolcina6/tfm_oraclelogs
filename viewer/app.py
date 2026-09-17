@@ -123,67 +123,6 @@ def list_log_types_for_date(storage, date_str):
 
     return sorted(result)
 
-
-# def list_available_dates(storage):
-#     """
-#     Recorre parsed_logs/ buscando carpetas con estructura año/mes/día y devuelve una lista de fechas disponibles en formato YYYY-MM-DD.
-
-#     Args: 
-#         storage: instancia de almacenamiento (local o S3)
-
-#     Returns:
-#         List[str]: Lista de fechas disponibles en formato YYYY-MM-DD, incluyendo "sin_fecha" si existe.
-#     """
-#     dates = set()
-#     all_json_files = storage.list_files(config['output_folder'], ".json")
-
-#     for file_info in all_json_files:
-#         if isinstance(file_info, tuple) and len(file_info) == 3:
-#             _, rel_path, _ = file_info
-#         else:
-#             _, rel_path = file_info
-            
-#         parts = rel_path.replace("\\", "/").split("/")
-#         if len(parts) == 4 and parts[0].isdigit():
-#             year, month, day = parts[0], parts[1], parts[2]
-#             dates.add(f"{year}-{month}-{day}")
-#         elif len(parts) == 2 and parts[0] == "sin_fecha":
-#             dates.add("sin_fecha")
-
-#     return sorted(dates, reverse=True)
-
-
-# def list_log_types_for_date(storage, date_str):
-#     """
-#     Devuelve los tipos de log disponibles para una fecha dada.
-
-#     Args:
-#         storage: instancia de almacenamiento (local o S3)
-#         date_str: fecha en formato YYYY-MM-DD o "sin_fecha"
-
-#     Returns:
-#         List[str]: Lista de tipos de log disponibles para la fecha especificada.
-#     """
-#     if date_str == "sin_fecha":
-#         prefix = f"{config['output_folder']}sin_fecha/"
-#     else:
-#         year, month, day = date_str.split("-")
-#         prefix = f"{config['output_folder']}{year}/{month}/{day}/"
-
-#     files = storage.list_files(prefix, ".json")
-#     result = set()
-    
-#     for file_info in files:
-#         if isinstance(file_info, tuple) and len(file_info) == 3:
-#             _, rel_path, _ = file_info
-#         else:
-#             _, rel_path = file_info
-            
-#         result.add(os.path.splitext(os.path.basename(rel_path))[0])
-    
-#     return sorted(result)
-
-
 def list_drain_origins(storage):
     """
     Devuelve lista de orígenes (jde, oracle, weblogic, etc.) en drain_results/.

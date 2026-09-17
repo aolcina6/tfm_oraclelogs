@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------
+# Mecanismo de alertas del Enterprise Server / JDE
+# ------------------------------------------------------------------------------------
+
 LOG_TYPE = "alert_jde"
 MULTILINE = True
 DRAIN_CONFIG = "baseline"

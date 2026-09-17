@@ -1,3 +1,7 @@
+# ------------------------------------------------------------------------------------
+# AIS (Application Interface Services) 
+# Servidor que proporciona servicios REST y APIs para interactuar con EnterpriseOne.
+# ------------------------------------------------------------------------------------
 LOG_TYPE = "ais"
 MULTILINE = True 
 DRAIN_CONFIG = "baseline"

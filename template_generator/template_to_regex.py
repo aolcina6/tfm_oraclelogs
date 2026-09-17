@@ -46,58 +46,66 @@ _SPACE_TOKEN = "\x00SPACE\x00"
 # Se ordenan las claves por longitud descendente para que, por ejemplo,
 # '<ALPHANUM>' se procese antes que un eventual '<A>' más corto (no aplica
 # aquí, pero es una guarda barata y correcta en general).
-_SORTED_PLACEHOLDERS = sorted(_PLACEHOLDER_PATTERNS.keys(), key=len, reverse=True)
+_PLACEHOLDER_ORDER = sorted(_PLACEHOLDER_PATTERNS.keys(), key=len, reverse=True)
 
 # Token único e improbable de colisionar con el texto real del template,
 # usado como marcador temporal mientras escapamos el resto del texto.
 _TOKEN_TEMPLATE = "\x00PH{}\x00"
 
 
-def template_to_regex(template: str, anchor: bool = True) -> re.Pattern:
+def _tokenize_template(template: str) -> list:
     """
-    Convierte un template de Drain3 (con placeholders <*>, <NUM>,
-    <ALPHANUM>, <UUID>, <PATH>...) en un regex compilado que matchea
-    líneas de log reales generadas a partir de ese template.
+    Extrae, en orden de aparición, los placeholders presentes en el
+    template (ej. '<*>', '<NUM>', '<UUID>'...), sustituyéndolos
+    temporalmente por tokens únicos para evitar colisiones al escapar
+    el resto del texto literal con re.escape().
 
-    Estrategia (para no romper el escaping):
-    1) Sustituir cada placeholder por un token temporal único.
-    2) Sustituir cada espacio literal por un token temporal único
-       (¡ANTES de escapar!, para que re.escape() no vuelva a escapar
-       el backslash que insertaremos después).
-    3) Escapar todo el texto restante con re.escape().
-    4) Reemplazar los tokens temporales (placeholders y espacios) por
-       sus patrones regex reales.
+    Args:
+        template (str): Template original con placeholders tipo <*>.
+
+    Returns:
+        list: Lista de placeholders encontrados, en orden de aparición.
     """
     tokens = []
+    remaining = template
+    for ph in _PLACEHOLDER_ORDER:
+        while ph in remaining:
+            remaining = remaining.replace(ph, "", 1)
+            tokens.append(ph)
+    return tokens
 
-    def _replace_placeholder(match):
-        ph = match.group(0)
-        idx = len(tokens)
-        tokens.append(ph)
-        return _TOKEN_TEMPLATE.format(idx)
 
-    # Paso 1: sustituir placeholders conocidos por tokens temporales
-    placeholder_re = re.compile('|'.join(re.escape(p) for p in _SORTED_PLACEHOLDERS))
-    tokenized = placeholder_re.sub(_replace_placeholder, template)
+def template_to_regex(template: str, anchor: bool = True) -> re.Pattern:
+    """
+    Convierte un template de Drain3 (con placeholders <*>, <NUM>, etc.)
+    en una expresión regular compilada, escapando el texto literal y
+    sustituyendo cada placeholder por su patrón regex correspondiente
+    (ver _PLACEHOLDER_PATTERNS).
 
-    # Paso 2: sustituir espacios por un token temporal ANTES de escapar
-    tokenized = re.sub(r' +', lambda m: _SPACE_TOKEN, tokenized)
+    Args:
+        template (str): Template original, ej. 'Usuario <*> conectado desde <IP>'.
+        anchor (bool): Si True, ancla el regex al inicio y fin de la
+            cadena (fullmatch). Si False, permite match parcial (search).
 
-    # Paso 3: escapar el resto del texto (literal)
-    escaped = re.escape(tokenized)
-
-    # Deshacer el escaping de los \x00 de nuestros tokens
-    escaped = escaped.replace(re.escape("\x00"), "\x00")
-
-    # Paso 4a: sustituir el token de espacio por \s+ usando .replace()
-    # (NO re.sub con string repl, para no interpretar '\' como backreference)
-    escaped = escaped.replace(_SPACE_TOKEN, r'\s+')
-
-    # Paso 4b: sustituir cada token temporal de placeholder por su patrón regex real
-    for idx, ph in enumerate(tokens):
+    Returns:
+        re.Pattern: Expresión regular compilada.
+    """
+    working = template
+    placeholder_map = {}
+    for idx, ph in enumerate(_PLACEHOLDER_ORDER):
         token = _TOKEN_TEMPLATE.format(idx)
+        if ph in working:
+            placeholder_map[token] = ph
+            working = working.replace(ph, token)
+
+    escaped = re.escape(working)
+
+    # re.escape() escapa también los caracteres \x00 usados como
+    # marcadores, así que hay que revertir ese escape antes de sustituir
+    for token, ph in placeholder_map.items():
+        escaped_token = re.escape(token)
         pattern = _PLACEHOLDER_PATTERNS[ph]
-        escaped = escaped.replace(token, pattern)
+        escaped = escaped.replace(escaped_token, pattern)
 
     if anchor:
         escaped = f'^{escaped}$'
@@ -116,7 +124,7 @@ def templates_to_regex_map(clusters: list, anchor: bool = True) -> dict:
         anchor (bool): Si True, el regex generado se ancla al inicio y fin
             de la cadena (equivalente a fullmatch). Si False, se permite
             match parcial (search).
-    
+
     Returns:
         dict: Mapa de cluster_id a regex compilado y metadatos
     """
@@ -141,9 +149,17 @@ def classify_message(message: str, regex_map: dict):
     """
     Intenta matchear un mensaje nuevo contra los templates ya minados.
     Devuelve el cluster_id del primer match, o None si no matchea ninguno.
+
+    Args:
+        message (str): Línea de log real a clasificar.
+        regex_map (dict): Mapa cluster_id -> {'regex': ..., ...}, tal como
+            lo devuelve templates_to_regex_map().
+
+    Returns:
+        int or None: cluster_id del primer match, o None si ninguno matchea.
     """
-    for cluster_id, info in regex_map.items():
-        if info['regex'].match(message):
+    for cluster_id, entry in regex_map.items():
+        if entry['regex'].fullmatch(message):
             return cluster_id
     return None
 

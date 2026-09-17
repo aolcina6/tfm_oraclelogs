@@ -101,7 +101,7 @@ def write_raw_origin_outputs(storage, origin: str, origin_result: Dict, output_f
         for idx, p in enumerate(origin_result['patterns'])
     ]
 
-    # --- patterns.json (se mantiene por compatibilidad hacia atrás) --
+    # patterns.json
     patterns_file = f"{origin_folder}/{origin}_patterns.json"
     patterns_summary = {
         'origin': origin,
@@ -118,7 +118,7 @@ def write_raw_origin_outputs(storage, origin: str, origin_result: Dict, output_f
     storage.write_json(patterns_file, patterns_summary)
     print(f"💾 Patrones guardados en: {patterns_file}")
 
-    # --- NUEVO: clusters.json (mismo esquema que el path parsed) ----
+    # clusters.json
     clusters_output = {
         'origin': origin,
         'analysis_date': analysis_date,
@@ -136,7 +136,7 @@ def write_raw_origin_outputs(storage, origin: str, origin_result: Dict, output_f
     storage.write_json(clusters_file, clusters_output)
     print(f"💾 Solo clusters guardado en: {clusters_file}")
 
-    # --- NUEVO: clusters.csv (idéntico formato al del path parsed) --
+    # clusters.csv
     csv_lines = ["cluster_id,size,percentage,template"]
     for c in cluster_stats:
         csv_lines.append(f"{c['cluster_id']},{c['size']},{c['percentage']},\"{c['template']}\"")
